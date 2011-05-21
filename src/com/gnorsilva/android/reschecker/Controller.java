@@ -83,4 +83,8 @@ public class Controller {
 		}
 	}
 	
+	public int getResourcesNotFound(){
+		return resources.size();
+	}
+	
 }
