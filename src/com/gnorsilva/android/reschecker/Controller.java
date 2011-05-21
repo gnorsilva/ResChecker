@@ -24,7 +24,7 @@ public class Controller {
 	public void searchProject(){
 		if(filesAreSetup()){
 			log("Loading resources for " + projectPath);
-			resources = ResourceExtractor.getResources(projectPath);
+			resources = new RFileResourceExtractor(projectPath).getResources();
 			try {
 				checkResources();
 			} catch (IOException e) {

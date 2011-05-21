@@ -30,7 +30,7 @@ public class StartUp {
 		}
 	}
 
-	public static void printHelp() {
+	private static void printHelp() {
 		log();
 		log("ResChecker finds out which resources are being used in your Android project");
 		log();

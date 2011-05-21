@@ -19,18 +19,25 @@ import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
-public class ResourceExtractor {
+public class RFileResourceExtractor {
 
-	public static Set<Resource> getResources(String projectPath) {
+	private final String projectPath;
+	private String packageName;
+
+	public RFileResourceExtractor(String projectPath) {
 		if ( !projectPath.endsWith(File.separator)){
 			projectPath += File.separator;
 		}
-		
+		this.projectPath = projectPath;
+	}
+
+	public Set<Resource> getResources() {
 		Set<Resource> resources = null;
 		try {
-			String packageName = getPackageName(projectPath);
-			Class<?> rFile = loadRClass(projectPath, packageName);
+			findPackageName();
+			Class<?> rFile = loadRClass();
 			resources = extractResources(rFile);
+			cleanUpCreatedFiles();
 		}  catch (ClassNotFoundException e) {
 			log("Unable to load R.java as a class for " + projectPath);
 			e.printStackTrace();
@@ -53,17 +60,16 @@ public class ResourceExtractor {
 		return resources;
 	}
 	
-	public static String getPackageName(String projectPath) throws ValidityException, ParsingException, IOException, PackageNotFoundException {
+	private void findPackageName() throws ValidityException, ParsingException, IOException, PackageNotFoundException {
 		Builder parser = new Builder();
 		Document doc = parser.build(projectPath + "AndroidManifest.xml");
-		String packageName = doc.getRootElement().getAttributeValue("package");
+		packageName = doc.getRootElement().getAttributeValue("package");
 		if ( packageName == null || packageName.length() == 0){
 			throw new PackageNotFoundException();
 		}
-		return packageName; 
 	}
 	
-	protected static Class<?> loadRClass(String projectPath, String packageName) throws ClassNotFoundException, MalformedURLException {
+	private Class<?> loadRClass() throws ClassNotFoundException, MalformedURLException {
 		String genDirPath = projectPath + "gen";
 		String rPath = genDirPath + File.separator + packageName.replace('.', File.separatorChar) + File.separator + "R.java";
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -73,14 +79,14 @@ public class ResourceExtractor {
 		return loader.loadClass(packageName + ".R");
 	}
 	
-	private static Set<Resource> extractResources(Class<?> rFile) {
+	private Set<Resource> extractResources(Class<?> rFile) {
 		Set<Resource> resources = new LinkedHashSet<Resource>();
 		for (Class<?> resTypeClass : rFile.getClasses()) {
 			String resType = resTypeClass.getSimpleName();
-			for ( Field resource : resTypeClass.getFields()){
-				try{
-				resources.add(new Resource(resType, resource.getName()));
-				}catch(NullPointerException e){
+			for (Field resource : resTypeClass.getFields()) {
+				try {
+					resources.add(new Resource(resType, resource.getName()));
+				} catch (NullPointerException e) {
 					log("Unable to add resource for type " + resType + " and name " + resource.getName());
 				}
 			}
@@ -91,5 +97,15 @@ public class ResourceExtractor {
 	public static class PackageNotFoundException extends Exception{
 		private static final long serialVersionUID = -1378381061138252764L;
 		
+	}
+	
+	private void cleanUpCreatedFiles() {
+		String path = projectPath + "gen" + File.separator + packageName.replace('.', File.separatorChar);
+		File rFolder = new File(path);
+		for( File file : rFolder.listFiles()){
+			if( file.getName().endsWith(".class")){
+				file.delete();
+			}
+		}
 	}
 }
