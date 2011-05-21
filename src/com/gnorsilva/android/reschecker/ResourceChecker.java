@@ -1,74 +1,71 @@
 package com.gnorsilva.android.reschecker;
 
-import static com.gnorsilva.android.reschecker.Utils.log;
-
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class ResourceChecker {
 	
-	private final List<Resource> resources;
-	private final File manifest;
-	private final File resFolder;
-	private final File srcFolder;
+	private static final String JAVA = ".java";
+	private static final String XML = ".xml";
+	private final Set<Resource> resources;
+	private final int initialSize;
+	private int resourcesFound;
 	
-	private ResourceChecker(List<Resource> resources, File manifest, File resFolder, File srcFolder){
+	public ResourceChecker(Set<Resource> resources){
 		this.resources = resources;
-		this.manifest = manifest;
-		this.resFolder = resFolder;
-		this.srcFolder = srcFolder;
+		initialSize = resources.size();
 	}
 	
-	private ResourceChecker(File manifest, File resFolder, File srcFolder){
-		resources = null;
-		this.manifest = manifest;
-		this.resFolder = resFolder;
-		this.srcFolder = srcFolder;
-	}
-	
-	private boolean foundInManifest(Resource res) throws IOException {
-		return Utils.findInFile(res.getXMLPattern(), manifest);
-	}
-	
-	private boolean foundInResFolder(Resource res) throws IOException {
-		return Utils.findInFolder(res.getXMLPattern(), resFolder);
-	}
-
-	private boolean foundInSrcFolder(Resource res) throws IOException {
-		return Utils.findInFolder(res.getJavaPattern(), srcFolder);
-	}
-	
-	private int findResources(){
-		int resourcesNotUsed = 0;
-		for ( Resource res : resources){
-			if(!isResourceUsed(res)){
-				resourcesNotUsed++;
+	public void findUnusedResources(File ... files) throws IOException{
+		for(File file : files){
+			if(file.isDirectory()){
+				findInFolder(file);
+			}else if(file.isFile()){
+				findInFile(file);
 			}
 		}
-		return resourcesNotUsed;
-	}
-	
-	private boolean isResourceUsed(Resource res) {
-		boolean isResourceFound = false;
-		try{
-			isResourceFound = foundInManifest(res) || foundInResFolder(res) || foundInSrcFolder(res);
-			if(!isResourceFound){
-				log(res.toString() + " is not being used");
-			}
-		}catch(IOException e){
-			log("Error occurred while searching for resource " + res.toString());
-			e.printStackTrace();
-		}
-		return isResourceFound;
-	}
-	
-	public static int findUnusedResources(List<Resource> resources, File manifest, File resFolder, File srcFolder) {
-		return new ResourceChecker(resources, manifest, resFolder, srcFolder).findResources();
-	}
-	
-	public static boolean isResourceUsed(Resource resource, File manifest, File resFolder, File srcFolder) {
-		return new ResourceChecker(manifest, resFolder, srcFolder).isResourceUsed(resource);
 	}
 
+	protected void findInFolder(File folder) throws IOException {
+		for (File file : folder.listFiles()) {
+			if (file.isDirectory()) {
+				findInFolder(file);
+			} else if (file.isFile()) {
+				if(file.getName().endsWith(JAVA) || file.getName().endsWith(XML)){
+					findInFile(file);
+				}
+			}
+		}
+	}
+
+	protected void findInFile(File file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		boolean isXml = file.getName().endsWith(".xml") ? true : false;
+		String line;
+		while( (line = reader.readLine()) != null ){
+			matchLine(isXml, line);
+		}
+		reader.close();
+	}
+	
+	private void matchLine(boolean isXml, String line) {
+		for (Iterator<Resource> i = resources.iterator(); i.hasNext();) {
+		    Resource res = i.next();
+			Pattern pattern = isXml ? res.getXMLPattern() : res.getJavaPattern();
+			if(pattern.matcher(line).find()){
+				i.remove();
+				updateResourceLog();
+			}
+		}
+	}
+
+	private void updateResourceLog() {
+		System.out.print("Resources used: " + (++resourcesFound) + "/" + initialSize + " \r");
+	}
+	
 }

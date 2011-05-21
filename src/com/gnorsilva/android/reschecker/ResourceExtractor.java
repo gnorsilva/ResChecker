@@ -1,18 +1,18 @@
 package com.gnorsilva.android.reschecker;
 
+import static com.gnorsilva.android.reschecker.Utils.log;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
-
-import static com.gnorsilva.android.reschecker.Utils.log;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -21,8 +21,12 @@ import nu.xom.ValidityException;
 
 public class ResourceExtractor {
 
-	public static List<Resource> getResources(String projectPath) {
-		List<Resource> resources = null;
+	public static Set<Resource> getResources(String projectPath) {
+		if ( !projectPath.endsWith(File.separator)){
+			projectPath += File.separator;
+		}
+		
+		Set<Resource> resources = null;
 		try {
 			String packageName = getPackageName(projectPath);
 			Class<?> rFile = loadRClass(projectPath, packageName);
@@ -69,8 +73,8 @@ public class ResourceExtractor {
 		return loader.loadClass(packageName + ".R");
 	}
 	
-	private static List<Resource> extractResources(Class<?> rFile) {
-		List<Resource> resources = new ArrayList<Resource>();
+	private static Set<Resource> extractResources(Class<?> rFile) {
+		Set<Resource> resources = new LinkedHashSet<Resource>();
 		for (Class<?> resTypeClass : rFile.getClasses()) {
 			String resType = resTypeClass.getSimpleName();
 			for ( Field resource : resTypeClass.getFields()){
