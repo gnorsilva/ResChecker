@@ -12,7 +12,7 @@ import java.util.List;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import com.gnorsilva.android.reschecker.Utils.Log;
+import static com.gnorsilva.android.reschecker.Utils.log;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -28,22 +28,22 @@ public class ResourceExtractor {
 			Class<?> rFile = loadRClass(projectPath, packageName);
 			resources = extractResources(rFile);
 		}  catch (ClassNotFoundException e) {
-			Log.v("Unable to load R.java as a class for " + projectPath);
+			log("Unable to load R.java as a class for " + projectPath);
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
-			Log.v("Unable to read the \"gen\" folder for " + projectPath);
+			log("Unable to read the \"gen\" folder for " + projectPath);
 			e.printStackTrace();
 		} catch (ValidityException e) {
-			Log.v("Unable to validate the AndroidManifest.xml for " + projectPath);
+			log("Unable to validate the AndroidManifest.xml for " + projectPath);
 			e.printStackTrace();
 		} catch (ParsingException e) {
-			Log.v("Unable to parse the AndroidManifest.xml for " + projectPath);
+			log("Unable to parse the AndroidManifest.xml for " + projectPath);
 			e.printStackTrace();
 		} catch (IOException e) {
-			Log.v("Unable to read the AndroidManifest.xml for " + projectPath);
+			log("Unable to read the AndroidManifest.xml for " + projectPath);
 			e.printStackTrace();
 		} catch (PackageNotFoundException e) {
-			Log.v("Unable to find package attribute in AndroidManifest.xml for " + projectPath);
+			log("Unable to find package attribute in AndroidManifest.xml for " + projectPath);
 			e.printStackTrace();
 		}
 		return resources;
@@ -77,7 +77,7 @@ public class ResourceExtractor {
 				try{
 				resources.add(new Resource(resType, resource.getName()));
 				}catch(NullPointerException e){
-					Log.v("Unable to add resource for type " + resType + " and name " + resource.getName());
+					log("Unable to add resource for type " + resType + " and name " + resource.getName());
 				}
 			}
 		}

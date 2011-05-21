@@ -21,7 +21,7 @@ public class Resource {
 		if ( resourceType == null || resourceName == null || resourceType.length() == 0 || resourceName.length() == 0){
 			throw new NullPointerException("Resource Type and Resource Name cannot be null");
 		}
-		xml = Pattern.compile("\\W@" + resourceType + "\\/" + resourceName + "\\W");
+		xml = Pattern.compile("((\\W@" + resourceType + "\\/|parent=\")" + resourceName + "\\W)|\\W" + resourceName + "\\.");
 		java = Pattern.compile("\\WR." + resourceType + "." + resourceName + "\\W");
 		this.resourceName = resourceName;
 		this.resourceType = resourceType;
@@ -60,6 +60,6 @@ public class Resource {
 
 	@Override
 	public String toString() {
-		return resourceType + " \"" + resourceName + "\"";
+		return resourceType + "." + resourceName;
 	}
 }
