@@ -4,3 +4,12 @@
 *gen/
 *R.java
 *local.properties
+*.jar
+*.class
+
+target/
+lib_managed/
+src_managed/
+project/boot/
+
+temp/
