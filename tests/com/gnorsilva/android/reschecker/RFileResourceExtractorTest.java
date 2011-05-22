@@ -2,6 +2,7 @@ package com.gnorsilva.android.reschecker;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.Set;
@@ -20,6 +21,12 @@ public class RFileResourceExtractorTest implements TestConstants{
 		assertTrue(resources.contains(icon));
 		Resource mainLayout = new Resource("layout", "main");
 		assertTrue(resources.contains(mainLayout));
+	}
+	
+	@Test 
+	public void wrongProjectPaths(){
+		Set<Resource> resources = new RFileResourceExtractor(".").getResources();
+		assertNull(resources);
 	}
 	
 	@After

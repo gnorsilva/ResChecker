@@ -2,7 +2,9 @@ package com.gnorsilva.android.reschecker;
 
 import static com.gnorsilva.android.reschecker.Utils.log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -10,14 +12,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
-
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.ParsingException;
-import nu.xom.ValidityException;
 
 public class RFileResourceExtractor {
 
@@ -44,12 +43,6 @@ public class RFileResourceExtractor {
 		} catch (MalformedURLException e) {
 			log("Unable to read the \"gen\" folder for " + projectPath);
 			e.printStackTrace();
-		} catch (ValidityException e) {
-			log("Unable to validate the AndroidManifest.xml for " + projectPath);
-			e.printStackTrace();
-		} catch (ParsingException e) {
-			log("Unable to parse the AndroidManifest.xml for " + projectPath);
-			e.printStackTrace();
 		} catch (IOException e) {
 			log("Unable to read the AndroidManifest.xml for " + projectPath);
 			e.printStackTrace();
@@ -60,10 +53,19 @@ public class RFileResourceExtractor {
 		return resources;
 	}
 	
-	private void findPackageName() throws ValidityException, ParsingException, IOException, PackageNotFoundException {
-		Builder parser = new Builder();
-		Document doc = parser.build(projectPath + "AndroidManifest.xml");
-		packageName = doc.getRootElement().getAttributeValue("package");
+	public void findPackageName() throws IOException, PackageNotFoundException {
+		File file = new File(projectPath,"AndroidManifest.xml");
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		Pattern packagePat = Pattern.compile("package=\".+\"");
+		String line;
+		while( (line = reader.readLine()) != null ){
+			Matcher matcher = packagePat.matcher(line);
+			if(matcher.find()){
+				packageName = matcher.group().replaceAll("package=\"|\"", "");
+				break;
+			}
+		}
+		reader.close();
 		if ( packageName == null || packageName.length() == 0){
 			throw new PackageNotFoundException();
 		}
@@ -93,11 +95,6 @@ public class RFileResourceExtractor {
 		}
 		return resources;
 	}
-
-	public static class PackageNotFoundException extends Exception{
-		private static final long serialVersionUID = -1378381061138252764L;
-		
-	}
 	
 	private void cleanUpCreatedFiles() {
 		String path = projectPath + "gen" + File.separator + packageName.replace('.', File.separatorChar);
@@ -107,5 +104,10 @@ public class RFileResourceExtractor {
 				file.delete();
 			}
 		}
+	}
+	
+	public static class PackageNotFoundException extends Exception{
+		private static final long serialVersionUID = -1378381061138252764L;
+		
 	}
 }

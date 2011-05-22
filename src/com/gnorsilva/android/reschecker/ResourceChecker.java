@@ -45,7 +45,7 @@ public class ResourceChecker {
 
 	protected void findInFile(File file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		boolean isXml = file.getName().endsWith(".xml") ? true : false;
+		boolean isXml = file.getName().endsWith(XML) ? true : false;
 		String line;
 		while( (line = reader.readLine()) != null ){
 			matchLine(isXml, line);
