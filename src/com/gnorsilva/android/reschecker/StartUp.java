@@ -36,7 +36,7 @@ public class StartUp {
 		log();
 		log("Usage:");
 		log();
-		log("\t-p path of the project to be checked - project needs to have AndroidManifest.xml, and R.java inside the gen folder");
+		log("\t-p path of the project to be checked - project needs AndroidManifest.xml and also R.java inside the gen folder");
 		log("\t-h prints this message");
 		log();
 	}

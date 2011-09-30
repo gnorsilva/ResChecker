@@ -53,10 +53,10 @@ public class RFileResourceExtractor {
 		return resources;
 	}
 	
-	public void findPackageName() throws IOException, PackageNotFoundException {
+	private void findPackageName() throws IOException, PackageNotFoundException {
 		File file = new File(projectPath,"AndroidManifest.xml");
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		Pattern packagePat = Pattern.compile("package=\".+\"");
+		Pattern packagePat = Pattern.compile("package=\"[\\w|.]*\"");
 		String line;
 		while( (line = reader.readLine()) != null ){
 			Matcher matcher = packagePat.matcher(line);
@@ -69,6 +69,7 @@ public class RFileResourceExtractor {
 		if ( packageName == null || packageName.length() == 0){
 			throw new PackageNotFoundException();
 		}
+		System.out.println(packageName);
 	}
 	
 	private Class<?> loadRClass() throws ClassNotFoundException, MalformedURLException {
