@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ResourceTest {
 
 	@Test
-	public void testEqualResources(){
+	public void two_equal_resources(){
 		Resource res1 = new Resource("string", "hello");
 		Resource res2 = new Resource("string", "hello");
 		assertEquals(res1, res2);
@@ -31,6 +31,7 @@ public class ResourceTest {
 	@Test
 	public void javaPatternShouldNotMatch(){
 		assertFalse(findInJava("layout","main","setContentView( R.layout.main_layout );"));
+		assertFalse(findInJava("layout","main","setContentView( R.layout.mainlayout );"));
 	}
 	
 	@Test
@@ -47,6 +48,6 @@ public class ResourceTest {
 		assertFalse(findInXML("style","Fill","<style name=\"custom_style\" parent=\"Fill_width\" />"));
 		assertFalse(findInXML("style","Fill","<style name=\"custom_style\" parent=\"FillWidth\" />"));
 	}
-
+	
 }
 

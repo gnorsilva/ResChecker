@@ -87,11 +87,7 @@ public class RFileResourceExtractor {
 		for (Class<?> resTypeClass : rFile.getClasses()) {
 			String resType = resTypeClass.getSimpleName();
 			for (Field resource : resTypeClass.getFields()) {
-				try {
-					resources.add(new Resource(resType, resource.getName()));
-				} catch (NullPointerException e) {
-					log("Unable to add resource for type " + resType + " and name " + resource.getName());
-				}
+				resources.add(new Resource(resType, resource.getName()));
 			}
 		}
 		return resources;

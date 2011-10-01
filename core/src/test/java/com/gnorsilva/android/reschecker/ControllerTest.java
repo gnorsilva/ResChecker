@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.gnorsilva.android.reschecker.testutils.TestConstants;
+
 public class ControllerTest implements TestConstants{
 
 	@Test

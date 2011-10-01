@@ -3,24 +3,21 @@ package com.gnorsilva.android.reschecker;
 import java.util.regex.Pattern;
 
 public class Resource {
-	
+
 	private final Pattern xml;
 	private final Pattern java;
 	private final String resourceType;
 	private final String resourceName;
-	
-	public Pattern getJavaPattern(){
+
+	public Pattern getJavaPattern() {
 		return java;
 	}
-	
-	public Pattern getXMLPattern(){
+
+	public Pattern getXMLPattern() {
 		return xml;
 	}
 
-	public Resource(String resourceType, String resourceName) throws NullPointerException{
-		if ( resourceType == null || resourceName == null || resourceType.length() == 0 || resourceName.length() == 0){
-			throw new NullPointerException("Resource Type and Resource Name cannot be null");
-		}
+	public Resource(String resourceType, String resourceName) {
 		xml = Pattern.compile("((\\W@" + resourceType + "\\/|parent=\")" + resourceName + "\\W)|\\W" + resourceName + "\\.");
 		java = Pattern.compile("\\WR." + resourceType + "." + resourceName + "\\W");
 		this.resourceName = resourceName;

@@ -11,6 +11,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.gnorsilva.android.reschecker.testutils.TestConstants;
+
 
 public class ResourceCheckerTest implements TestConstants{
 	
